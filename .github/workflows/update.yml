@@ -5,6 +5,9 @@ on:
     - cron: '0 0 * * *'  # Tự động chạy mỗi ngày 1 lần vào lúc 00:00 UTC
   workflow_dispatch:     # Cho phép bạn bấm nút chạy thủ công bất cứ lúc nào trên web
 
+permissions:
+  contents: write        # BẮT BUỘC PHẢI CÓ để cho phép bot đẩy tệp blocklist.bin lên lại kho
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,7 +22,7 @@ jobs:
 
       - name: Build blocklist.bin
         run: |
-          # Dùng bộ lọc AdGuard DNS (hoặc bạn có thể tùy chỉnh thêm nguồn khác)
+          # Dùng bộ lọc AdGuard DNS
           python build_blocklist.py blocklist.bin https://filters.adtidy.org/extension/chromium/filters/15.txt
 
       - name: Commit and push if changed
