@@ -1,0 +1,31 @@
+name: Build Blocklist
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Tự động chạy mỗi ngày 1 lần vào lúc 00:00 UTC
+  workflow_dispatch:     # Cho phép bạn bấm nút chạy thủ công bất cứ lúc nào trên web
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Build blocklist.bin
+        run: |
+          # Dùng bộ lọc AdGuard DNS (hoặc bạn có thể tùy chỉnh thêm nguồn khác)
+          python build_blocklist.py blocklist.bin https://filters.adtidy.org/extension/chromium/filters/15.txt
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add blocklist.bin
+          git commit -m "Auto-update blocklist.bin" || exit 0
+          git push
